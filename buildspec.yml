@@ -1,0 +1,22 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto11  # Replace with the relevant runtime for your project.
+    commands:
+      - echo Installing dependencies
+      - apt-get update && apt-get install -y wget unzip
+      - wget https://github.com/SonarSource/sonar-scanner-cli/releases/download/4.7.0.2747/sonar-scanner-4.7.0.2747-linux.zip
+      - unzip sonar-scanner-4.7.0.2747-linux.zip -d /opt/sonar-scanner
+      - export PATH=$PATH:/opt/sonar-scanner/sonar-scanner-4.7.0.2747-linux/bin
+      - echo $SONARQUBE_TOKEN > /tmp/sonar_token.txt  # Store token securely
+
+  build:
+    commands:
+      - echo Starting SonarQube analysis
+      - sonar-scanner -Dsonar.projectKey=38a3f1733ca11fdd8720e1b236c77112695d2585 -Dsonar.organization=MueenAfzal -Dsonar.host.url=$SONARQUBE_URL -Dsonar.login=$SONARQUBE_TOKEN
+    
+artifacts:
+  files:
+    - '**/*'
