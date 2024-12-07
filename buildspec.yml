@@ -23,16 +23,18 @@
 #     commands:
 #       - echo Starting SonarQube analysis
 #       - sonar-scanner -Dsonar.projectKey=38a3f1733ca11fdd8720e1b236c77112695d2585 -Dsonar.organization=MueenAfzal -Dsonar.host.url=$SONARQUBE_URL -Dsonar.login=$SONARQUBE_TOKEN
-
-
 version: 0.2
+
 phases:
   install:
     runtime-versions:
       java: corretto17  
+    commands:
+      - echo Installing dependencies...
 
   pre_build:
     commands:
+      - echo Pre-build phase: setting up dependencies...
       - yum update -y    
       - yum install -y jq 
       - retry_count=3
@@ -46,21 +48,14 @@ phases:
 
   build:
     commands:
+      - echo Build phase: running SonarQube analysis...
       - find / -name pom.xml -exec mv {} ./pom.xml \; || true 
       - mvn sonar:sonar -Dsonar.login=38a3f1733ca11fdd8720e1b236c77112695d2585 -Dsonar.host.url=https://sonarcloud.io/ -Dsonar.projectKey=MueenAfzal_Employee_Management -Dsonar.organization=mueenafzal
       - sleep 5
       # Check the HTTP response status code directly
       - if curl -s -o /dev/null -w "%{http_code}" https://sonarcloud.io/api/qualitygates/project_status?projectKey=MueenAfzal_Employee_Management != "200"; then exit 1; fi
-      
-  artefacts:
-    files:
-      - '**/*'
 
-
-
-
-
-
-
-
+artifacts:
+  files:
+    - '**/*'
 
