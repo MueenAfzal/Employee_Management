@@ -41,16 +41,18 @@ phases:
           -Dsonar.projectKey=MueenAfzal_mueen-dev-project-real \
           -Dsonar.organization=mueenafzal
       - echo "Checking SonarCloud quality gate status..."
-      - STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" "https://sonarcloud.io/api/qualitygates/project_status?projectKey=MueenAfzal_mueen-dev-project-real")
-      - if [ "$STATUS_CODE" -ne 200 ]; then 
-          echo "SonarCloud Quality Gate check failed with status code: $STATUS_CODE";
-          exit 1; 
+      - |
+        STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" "https://sonarcloud.io/api/qualitygates/project_status?projectKey=MueenAfzal_mueen-dev-project-real")
+        if [ "$STATUS_CODE" -ne 200 ]; then 
+          echo "SonarCloud Quality Gate check failed with status code: $STATUS_CODE"
+          exit 1
         fi
       - echo "SonarCloud Quality Gate passed successfully."
 
 artifacts:
   files:
     - '**/*'
+
 
 
 # version: 0.2
