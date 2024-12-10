@@ -8,12 +8,10 @@ phases:
       - echo "Installing necessary dependencies..."
       - yum update -y    
       - yum install -y jq wget unzip
-      # Download and set up Maven
       - wget -q https://archive.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz
       - tar xzf apache-maven-3.5.4-bin.tar.gz
       - mv apache-maven-3.5.4 /usr/local/apache-maven
       - export PATH=$PATH:/usr/local/apache-maven/bin
-      # Download and set up Sonar Scanner
       - wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.3.0.1492-linux.zip
       - unzip sonar-scanner-cli-3.3.0.1492-linux.zip
       - mv sonar-scanner-3.3.0.1492-linux /usr/local/sonar-scanner
@@ -52,7 +50,6 @@ phases:
 artifacts:
   files:
     - '**/*'
-
 
 
 # version: 0.2
