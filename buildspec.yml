@@ -1,88 +1,20 @@
 version: 0.2
-
 phases:
-  install:
-    runtime-versions:
-      java: corretto17
+    install:
+        runtime-versions:
+            python: 3.10
+        commands:
+             - pip install --upgrade pip
+             - pip install pylint
+               # Install dependencies needed for running the static analysis
+             - pip install -r requirements.txt 
+pre_build:
     commands:
-      - echo "Installing necessary dependencies..."
-      - yum update -y
-      - yum install -y jq wget unzip
-      - wget -q https://archive.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz
-      - tar xzf apache-maven-3.5.4-bin.tar.gz
-      - mv apache-maven-3.5.4 /usr/local/apache-maven
-      - export PATH=$PATH:/usr/local/apache-maven/bin
-      - wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.3.0.1492-linux.zip
-      - unzip sonar-scanner-cli-3.3.0.1492-linux.zip
-      - mv sonar-scanner-3.3.0.1492-linux /usr/local/sonar-scanner
-      - export PATH=$PATH:/usr/local/sonar-scanner/bin
-
-  pre_build:
-    commands:
-      - echo "Pre-build phase: Setting up environment..."
-      - mvn -v
-      - sonar-scanner --version
-
-  build:
-    commands:
-      - echo "Build phase: Building the project..."
-      - find / -name pom.xml -exec mv {} ./pom.xml \; || echo "No pom.xml found in root directories"
-      - mvn clean install
-      - echo "Build completed successfully."
-
-  post_build:
-    commands:
-      - echo "Post-build phase: Running SonarCloud analysis..."
-      - mvn sonar:sonar -Dsonar.login=e72f48130f1c3e8f088ccf093cd88f236a88c172 -Dsonar.host.url=https://sonarcloud.io -Dsonar.projectKey=MueenAfzal_mueen-dev-project-real -Dsonar.organization=mueenafzal
-      - echo "Checking SonarCloud quality gate status..."
-      - export STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" "https://sonarcloud.io/api/qualitygates/project_status?projectKey=MueenAfzal_mueen-dev-project-real")
-      - echo "SonarCloud Quality Gate check status code: $STATUS_CODE"
-      - '[ "$STATUS_CODE" -ne 200 ] && echo "SonarCloud Quality Gate check failed" || echo "SonarCloud Quality Gate passed"'
-
+     - python --version
+     - pylint $CODEBUILD_SRC_DIR/*.py || true
+     - pylint $CODEBUILD_SRC_DIR/trav/*.py || true
+     - pylint $CODEBUILD_SRC_DIR/travelling/*.py || true
+         
 artifacts:
-  files:
-    - '**/*'
-
-
-
-# version: 0.2
-# phases:
-#   install:
-#     runtime-versions:
-#       java: corretto17  
-
-#   pre_build:
-#     commands:
-#       - echo "Pre-build phase: Setting up dependencies..."
-#       - yum update -y
-#       - yum install -y jq
-#       - |
-#         retry_count=3
-#         for i in $(seq 1 $retry_count); do 
-#           wget https://archive.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz && break || sleep 10; 
-#         done
-#       - tar xzf apache-maven-3.5.4-bin.tar.gz || true
-#       - ln -s apache-maven-3.5.4 maven
-#       - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.3.0.1492-linux.zip
-#       - unzip ./sonar-scanner-cli-3.3.0.1492-linux.zip
-#       - mv sonar-scanner-3.3.0.1492-linux /sonar-scanner
-#       - export PATH=$PATH:/sonar-scanner/bin/
-
-#   build:
-#     commands:
-#       - echo "Build phase: Running SonarQube analysis..."
-#       - find / -name pom.xml -exec mv {} ./pom.xml \; || true
-#       - mvn sonar:sonar -Dsonar.login=38a3f1733ca11fdd8720e1b236c77112695d2585 -Dsonar.host.url=https://sonarcloud.io/ -Dsonar.projectKey=MueenAfzal_Employee_Management -Dsonar.organization=mueenafzal
-#       - sleep 5
-#       - |
-#         status_code=$(curl -s -o /dev/null -w "%{http_code}" https://sonarcloud.io/api/qualitygates/project_status?projectKey=MueenAfzal_Employee_Management)
-#         if [ "$status_code" != "200" ]; then 
-#           echo "SonarQube Quality Gate failed. Exiting with error."; 
-#           exit 1; 
-#         fi
-
-# artifacts:
-#   files:
-#     - '**/*'
-
-
+    files:
+     - '**/*'
