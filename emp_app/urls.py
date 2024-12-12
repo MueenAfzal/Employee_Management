@@ -1,6 +1,8 @@
 
 from django.urls import path, include
 from . import views
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [    
     path('', views.index, name='index'),
@@ -11,4 +13,4 @@ urlpatterns = [
     path('remove', views.remove, name='remove'),
     path('remove/<int:emp_id>', views.remove, name='remove'),
     path('filter', views.filter, name='filter'),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
